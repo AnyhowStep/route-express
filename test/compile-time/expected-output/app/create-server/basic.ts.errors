@@ -1,0 +1,106 @@
+[
+  {
+    "messageText": {
+      "messageText": "Argument of type 'IApp<{ requiredLocals: { [k: string]: never; }; locals: { [k: string]: never; }; }>' is not assignable to parameter of type 'ServerOptions'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Types of property 'IncomingMessage' are incompatible.",
+        "category": 1,
+        "code": 2326,
+        "next": {
+          "messageText": "Type '[\"This app has requiredLocals\", { [k: string]: never; }, \"and cannot be\", RequestListener] | undefined' is not assignable to type 'typeof IncomingMessage | undefined'.",
+          "category": 1,
+          "code": 2322,
+          "next": {
+            "messageText": "Type '[\"This app has requiredLocals\", { [k: string]: never; }, \"and cannot be\", RequestListener]' is not assignable to type 'typeof IncomingMessage'.",
+            "category": 1,
+            "code": 2322
+          }
+        }
+      }
+    },
+    "code": 2345,
+    "category": 1,
+    "length": 20,
+    "start": 791
+  },
+  {
+    "messageText": {
+      "messageText": "Argument of type 'IApp<{ requiredLocals: { [k: string]: string; }; locals: { [k: string]: string; }; }>' is not assignable to parameter of type 'ServerOptions'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Types of property 'IncomingMessage' are incompatible.",
+        "category": 1,
+        "code": 2326,
+        "next": {
+          "messageText": "Type '[\"This app has requiredLocals\", { [k: string]: string; }, \"and cannot be\", RequestListener] | undefined' is not assignable to type 'typeof IncomingMessage | undefined'.",
+          "category": 1,
+          "code": 2322,
+          "next": {
+            "messageText": "Type '[\"This app has requiredLocals\", { [k: string]: string; }, \"and cannot be\", RequestListener]' is not assignable to type 'typeof IncomingMessage'.",
+            "category": 1,
+            "code": 2322
+          }
+        }
+      }
+    },
+    "code": 2345,
+    "category": 1,
+    "length": 21,
+    "start": 832
+  },
+  {
+    "messageText": {
+      "messageText": "Argument of type 'IApp<{ requiredLocals: { test: string; }; locals: { test: string; }; }>' is not assignable to parameter of type 'ServerOptions'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Types of property 'IncomingMessage' are incompatible.",
+        "category": 1,
+        "code": 2326,
+        "next": {
+          "messageText": "Type '[\"This app has requiredLocals\", { test: string; }, \"and cannot be\", RequestListener] | undefined' is not assignable to type 'typeof IncomingMessage | undefined'.",
+          "category": 1,
+          "code": 2322,
+          "next": {
+            "messageText": "Type '[\"This app has requiredLocals\", { test: string; }, \"and cannot be\", RequestListener]' is not assignable to type 'typeof IncomingMessage'.",
+            "category": 1,
+            "code": 2322
+          }
+        }
+      }
+    },
+    "code": 2345,
+    "category": 1,
+    "length": 20,
+    "start": 874
+  },
+  {
+    "messageText": {
+      "messageText": "Argument of type 'IApp<{ requiredLocals: { test: string; test2: number; }; locals: { test: string; test2: number; }; }>' is not assignable to parameter of type 'ServerOptions'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Types of property 'IncomingMessage' are incompatible.",
+        "category": 1,
+        "code": 2326,
+        "next": {
+          "messageText": "Type '[\"This app has requiredLocals\", { test: string; test2: number; }, \"and cannot be\", RequestListener] | undefined' is not assignable to type 'typeof IncomingMessage | undefined'.",
+          "category": 1,
+          "code": 2322,
+          "next": {
+            "messageText": "Type '[\"This app has requiredLocals\", { test: string; test2: number; }, \"and cannot be\", RequestListener]' is not assignable to type 'typeof IncomingMessage'.",
+            "category": 1,
+            "code": 2322
+          }
+        }
+      }
+    },
+    "code": 2345,
+    "category": 1,
+    "length": 26,
+    "start": 915
+  }
+]

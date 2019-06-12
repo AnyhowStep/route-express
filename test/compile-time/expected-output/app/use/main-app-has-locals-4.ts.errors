@@ -1,0 +1,44 @@
+[
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { foo: true | 1; bar: string | null; baz: number; }; locals: { foo: true | 1; bar: string | null; baz: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"baz\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 11,
+    "start": 592
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { foo: true | 1; bar: string | null; baz: number; }; locals: { foo: true | 1; bar: string | null; baz: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"baz\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 11,
+    "start": 623
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { foo: true; bar: string | null; baz: number; }; locals: { foo: true; bar: string | null; baz: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"baz\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 9,
+    "start": 801
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { foo: true; bar: string | null; baz: number; }; locals: { foo: true; bar: string | null; baz: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"baz\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 9,
+    "start": 830
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { foo: true | 2 | 1; bar: string | null; baz: number; }; locals: { foo: true | 2 | 1; bar: string | null; baz: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"baz\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 11,
+    "start": 1016
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { foo: true | 2 | 1; bar: string | null; baz: number; }; locals: { foo: true | 2 | 1; bar: string | null; baz: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"baz\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 11,
+    "start": 1047
+  }
+]

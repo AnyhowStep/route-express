@@ -1,0 +1,36 @@
+{
+  "name": "route-express",
+  "version": "0.0.0",
+  "description": "Handle requests using route-declaration and express",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "rebuild": "(rm -r ./dist || true) && (npm run build)",
+    "test-compile-time": "ts-node -P ./test/compile-time/tsconfig.json ./test/compile-time/runner.ts",
+    "accept-compile-time": "ts-node -P ./test/compile-time/tsconfig.json ./test/compile-time/accept-actual.ts",
+    "accept-one": "ts-node -P ./test/compile-time/tsconfig.json ./test/compile-time/accept-one.ts",
+    "test-compile-time-interactive": "ts-node -P ./test/compile-time/tsconfig.json ./test/compile-time/interactive.ts",
+    "test-run-time": "ts-node -P ./test/run-time/tsconfig.json -r ./test/run-time/tape-stream.ts -r ./test/run-time/bigint-to-json.ts ./test/run-time/runner.ts",
+    "generate-http-status-code": "ts-node -P ./script/tsconfig.json ./script/src/generate-http-status-code.ts",
+    "sanity-check": "(npm run generate-http-status-code) && (npm run rebuild) && (npm run test-compile-time) && (npm run test-run-time)"
+  },
+  "author": "anyhowstep",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/diff": "^4.0.2",
+    "@types/tape": "^4.2.33",
+    "diff": "^4.0.1",
+    "route-client": "^0.1.4",
+    "tape": "^4.10.2",
+    "ts-node": "^8.2.0",
+    "typescript": "^3.5.1"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.0",
+    "express": "^4.17.1",
+    "route-declaration": "^0.3.1",
+    "type-mapping": "^1.4.1"
+  }
+}

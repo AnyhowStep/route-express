@@ -1,0 +1,15 @@
+{
+    "extends" : "../../tsconfig-base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+
+        "target": "esnext",
+        "experimentalDecorators": true
+    },
+    "include" : [
+        "./bigint-to-json.ts",
+        "./runner.ts",
+        "./tape-stream.ts",
+        "./util.ts"
+    ]
+}

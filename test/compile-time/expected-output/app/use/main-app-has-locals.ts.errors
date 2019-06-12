@@ -1,0 +1,72 @@
+[
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { [k: string]: never; }; locals: { [k: string]: never; }; }>' is not assignable to parameter of type '[{ [k: string]: never; }, \"string index signature required but only\", { [k: string]: unknown; }, \"allowed\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 20,
+    "start": 1598
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { [k: string]: never; }; locals: { [k: string]: never; }; }>' is not assignable to parameter of type '[{ [k: string]: never; }, \"string index signature required but only\", { [k: string]: unknown; }, \"allowed\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 20,
+    "start": 1638
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { [k: string]: string; }; locals: { [k: string]: string; }; }>' is not assignable to parameter of type '[{ [k: string]: string; }, \"string index signature required but only\", { [k: string]: unknown; }, \"allowed\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 21,
+    "start": 1754
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { [k: string]: string; }; locals: { [k: string]: string; }; }>' is not assignable to parameter of type '[{ [k: string]: string; }, \"string index signature required but only\", { [k: string]: unknown; }, \"allowed\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 21,
+    "start": 1795
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { test: string; }; locals: { test: string; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"test\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 20,
+    "start": 1910
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { test: string; }; locals: { test: string; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"test\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 20,
+    "start": 1950
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { test: string; test2: number; }; locals: { test: string; test2: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"test\" | \"test2\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 26,
+    "start": 2076
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { test: string; test2: number; }; locals: { test: string; test2: number; }; }>' is not assignable to parameter of type '[\"The following locals are required but missing\", \"test\" | \"test2\"]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 26,
+    "start": 2122
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { field: true; }; locals: { field: true; }; }>' is not assignable to parameter of type '[\"Expected locals mismatch\", { field: { expected: true; actual: true | 1; }; }]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 9,
+    "start": 2452
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ requiredLocals: { field: true; }; locals: { field: true; }; }>' is not assignable to parameter of type '[\"Expected locals mismatch\", { field: { expected: true; actual: true | 1; }; }]'.",
+    "code": 2345,
+    "category": 1,
+    "length": 9,
+    "start": 2481
+  }
+]
