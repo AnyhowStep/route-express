@@ -1,7 +1,7 @@
 [
   {
     "messageText": {
-      "messageText": "Argument of type '(_err: any, req: Request<{ params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }>, res: Response<{ locals: {}; json: (response: unknown) => Response<ResponseData>; }>) => Promise<number>' is not assignable to parameter of type '__AsyncErrorVoidHandler<{ request: { params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }; response: { locals: {}; json: (response: unknown) => Response<ResponseData>; }; }, Promise<void | undefined>>'.",
+      "messageText": "Argument of type '(_err: any, req: Request<{ params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }>, res: Response<{ locals: Partial<{}>; json: (response: unknown) => Response<ResponseData>; }>) => Promise<...>' is not assignable to parameter of type '__AsyncErrorVoidHandler<{ request: { params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }; response: { locals: Partial<{}>; json: (response: unknown) => Response<ResponseData>; }; }, Promise<void | undefined>>'.",
       "category": 1,
       "code": 2345,
       "next": {

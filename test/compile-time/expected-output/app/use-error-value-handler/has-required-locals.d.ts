@@ -4,6 +4,6 @@ export declare const app: express.IApp<{
     locals: Partial<{
         isRequiredLocals: true;
     } & {
-        readonly inLocals: true;
+        test: 2;
     }>;
 }>;

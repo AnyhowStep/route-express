@@ -5,21 +5,18 @@ import * as handler from "../handler-lib";
 import {
     VoidHandlerUtil,
     __RequestVoidHandler,
-    __ErrorVoidHandler,
+    VoidHandler,
 } from "../void-handler";
 import {
     ValueHandlerUtil,
     __RequestValueHandler,
-    __ErrorValueHandler,
 } from "../value-handler";
 import {
     AsyncVoidHandlerUtil,
     __AsyncRequestVoidHandler,
-    __AsyncErrorVoidHandler
 } from "../async-void-handler";
 import {
     AsyncRequestValueHandler,
-    AsyncErrorValueHandler,
     AsyncValueHandlerUtil,
 } from "../async-value-handler";
 import {RouteData, IRoute} from "./route";
@@ -64,7 +61,8 @@ function getRouterHandler (
 }
 export interface RouteArgs {
     readonly routeDeclaration : rd.RouteData,
-    readonly expressRouter : expressCore.IRouter
+    readonly expressRouter : expressCore.IRouter,
+    readonly preRouteHandlers : VoidHandler<any>[],
 }
 class Route<DataT extends RouteData> implements IRoute<DataT> {
     private expressRouterHandler : expressCore.IRouterHandler<expressCore.IRoute>;
@@ -75,14 +73,6 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
         IRoute<DataT>
     ) {
         this.expressRouterHandler(VoidHandlerUtil.toSafeRequestVoidHandler(handler));
-        return this;
-    }
-    errorVoidHandler<
-        ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorVoidHandler<DataT, ReturnT>) : (
-        IRoute<DataT>
-    ) {
-        this.expressRouterHandler(VoidHandlerUtil.toSafeErrorVoidHandler(handler));
         return this;
     }
 
@@ -104,29 +94,6 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
         this.expressRouterHandler(ValueHandlerUtil.toSafeRequestVoidHandler(handler));
         return this;
     }
-    errorValueHandler<
-        NextLocalsT extends Locals,
-        ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorValueHandler<DataT, NextLocalsT, ReturnT>) : (
-        IRoute<{
-            request : DataT["request"],
-            response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                //Technically, this causes the wrong return type.
-                //`ReturnType<DataT["response"]["json"]>`
-                //should be `DataT["response"]["locals"] & NextLocalsT`
-                //But is instead,
-                //`DataT["response"]["locals"]`
-                json : DataT["response"]["json"],
-            }
-        }>
-    ) {
-        this.expressRouterHandler(ValueHandlerUtil.toSafeErrorVoidHandler(handler));
-        return this;
-    }
 
     asyncVoidHandler<
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
@@ -134,14 +101,6 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
         IRoute<DataT>
     ) {
         this.expressRouterHandler(AsyncVoidHandlerUtil.toSafeRequestVoidHandler(handler));
-        return this;
-    }
-    asyncErrorVoidHandler<
-        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
-    > (handler : __AsyncErrorVoidHandler<DataT, ReturnT>) : (
-        IRoute<DataT>
-    ) {
-        this.expressRouterHandler(AsyncVoidHandlerUtil.toSafeErrorVoidHandler(handler));
         return this;
     }
 
@@ -162,23 +121,6 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
         this.expressRouterHandler(AsyncValueHandlerUtil.toSafeRequestVoidHandler(handler));
         return this;
     }
-    asyncErrorValueHandler<
-        NextLocalsT extends Locals
-    > (handler : AsyncErrorValueHandler<DataT, NextLocalsT>) : (
-        IRoute<{
-            request : DataT["request"],
-            response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                json : DataT["response"]["json"],
-            }
-        }>
-    ) {
-        this.expressRouterHandler(AsyncValueHandlerUtil.toSafeErrorVoidHandler<any>(handler));
-        return this;
-    }
 
     constructor (args : RouteArgs) {
         const headerMapper = args.routeDeclaration.header;
@@ -195,14 +137,24 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
             the state of the `expressRoute` object changes.
         */
         this.expressRouterHandler(
-            (req, res, next) => {
+            ((req, res, next) => {
                 if (res.headersSent) {
                     console.warn(`Headers already sent for: ${req.method} ${req.path}. Skipping route handlers for: ${fullName}`);
                     return;
                 } else {
                     next();
                 }
-            },
+            }) as expressCore.RequestHandler,
+            //preRouteHandlers include,
+            //+ authentication
+            //+ wrapping res.json()
+            //+ logging
+            //+ etc.
+            ...args.preRouteHandlers,
+            /*
+                We do not permit any error handlers in `IRoute<>`
+                because we don't want any handlers catching a validation/mapping error.
+            */
             //We want to parse JSON body, if it hasn't already been parsed
             express.json(),
             handler.responseMapper(
@@ -290,13 +242,15 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
 
 export function route<RouteDeclarationT extends rd.RouteData> (
     routeDeclaration : RouteDeclarationT,
-    expressRouter : expressCore.IRouter
+    expressRouter : expressCore.IRouter,
+    preRouteHandlers : VoidHandler<any>[],
 ) : (
     IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, {}>>
 ) {
     return new Route<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, {}>>({
         routeDeclaration,
         expressRouter,
+        preRouteHandlers,
     });
 }
 /*

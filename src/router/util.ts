@@ -7,7 +7,7 @@ export type DataOf<RouterT extends IRouter<RouterData>> = (
     never
 );
 
-export type ToRouteData<DataT extends RouterData> = (
+export type ToRequestRouteData<DataT extends RouterData> = (
     {
         request : {
             params  : { [k : string] : unknown },
@@ -17,6 +17,24 @@ export type ToRouteData<DataT extends RouterData> = (
         },
         response : {
             locals : DataT["locals"],
+            //The ReturnType is technically incorrect
+            //I would prefer the param to be `never` but it
+            //seems like an `any` arg is not assignable to a `never` param.
+            json : (response : unknown) => Response<ResponseData>,
+        }
+    }
+);
+
+export type ToErrorRouteData<DataT extends RouterData> = (
+    {
+        request : {
+            params  : { [k : string] : unknown },
+            query   : { [k : string] : unknown },
+            body    : { [k : string] : unknown },
+            headers : { [k : string] : unknown },
+        },
+        response : {
+            locals : Partial<DataT["locals"]>,
             //The ReturnType is technically incorrect
             //I would prefer the param to be `never` but it
             //seems like an `any` arg is not assignable to a `never` param.

@@ -72,7 +72,7 @@ export type IRouterBase<DataT extends RouterData> = (
 export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
     voidHandler<
         ReturnT extends void|undefined=void|undefined
-    > (handler : __RequestVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
+    > (handler : __RequestVoidHandler<RouterUtil.ToRequestRouteData<DataT>, ReturnT>) : (
         IRouter<DataT>
     );
     /**
@@ -81,8 +81,11 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
     */
     errorVoidHandler<
         ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
-        IRouter<DataT>
+    > (handler : __ErrorVoidHandler<RouterUtil.ToErrorRouteData<DataT>, ReturnT>) : (
+        IRouter<{
+            __hasParentApp : DataT["__hasParentApp"],
+            locals : Partial<DataT["locals"]>,
+        }>
     );
 
     /**
@@ -93,7 +96,7 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
     valueHandler<
         NextLocalsT extends Locals,
         ReturnT extends void|undefined=void|undefined
-    > (handler : __RequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
+    > (handler : __RequestValueHandler<RouterUtil.ToRequestRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IRouter<{
             __hasParentApp : DataT["__hasParentApp"],
             locals : (
@@ -114,19 +117,19 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
     errorValueHandler<
         NextLocalsT extends Locals,
         ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
+    > (handler : __ErrorValueHandler<RouterUtil.ToErrorRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IRouter<{
             __hasParentApp : DataT["__hasParentApp"],
-            locals : (
+            locals : Partial<
                 & DataT["locals"]
                 & NextLocalsT
-            ),
+            >,
         }>
     );
 
     asyncVoidHandler<
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
-    > (handler : __AsyncRequestVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
+    > (handler : __AsyncRequestVoidHandler<RouterUtil.ToRequestRouteData<DataT>, ReturnT>) : (
         IRouter<DataT>
     );
     /**
@@ -135,12 +138,15 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
     */
     asyncErrorVoidHandler<
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
-    > (handler : __AsyncErrorVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
-        IRouter<DataT>
+    > (handler : __AsyncErrorVoidHandler<RouterUtil.ToErrorRouteData<DataT>, ReturnT>) : (
+        IRouter<{
+            __hasParentApp : DataT["__hasParentApp"],
+            locals : Partial<DataT["locals"]>,
+        }>
     );
 
     asyncValueHandler<NextLocalsT extends Locals> (
-        handler : AsyncRequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>
+        handler : AsyncRequestValueHandler<RouterUtil.ToRequestRouteData<DataT>, NextLocalsT>
     ) : (
         IRouter<{
             __hasParentApp : DataT["__hasParentApp"],
@@ -155,14 +161,14 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
         https://github.com/microsoft/TypeScript/issues/31867
     */
     asyncErrorValueHandler<NextLocalsT extends Locals> (
-        handler : AsyncErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>
+        handler : AsyncErrorValueHandler<RouterUtil.ToErrorRouteData<DataT>, NextLocalsT>
     ) : (
         IRouter<{
             __hasParentApp : DataT["__hasParentApp"],
-            locals : (
+            locals : Partial<
                 & DataT["locals"]
                 & NextLocalsT
-            ),
+            >,
         }>
     );
 

@@ -61,7 +61,7 @@ export type IAppBase<DataT extends AppData> = (
 export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
     voidHandler<
         ReturnT extends void|undefined=void|undefined
-    > (handler : __RequestVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
+    > (handler : __RequestVoidHandler<AppUtil.ToRequestRouteData<DataT>, ReturnT>) : (
         IApp<DataT>
     );
     /**
@@ -70,8 +70,11 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
     */
     errorVoidHandler<
         ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
-        IApp<DataT>
+    > (handler : __ErrorVoidHandler<AppUtil.ToErrorRouteData<DataT>, ReturnT>) : (
+        IApp<{
+            __hasParentApp : DataT["__hasParentApp"],
+            locals : Partial<DataT["locals"]>,
+        }>
     );
 
     /**
@@ -82,7 +85,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
     valueHandler<
         NextLocalsT extends Locals,
         ReturnT extends void|undefined=void|undefined
-    > (handler : __RequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
+    > (handler : __RequestValueHandler<AppUtil.ToRequestRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IApp<{
             __hasParentApp : DataT["__hasParentApp"],
             locals : (
@@ -103,19 +106,19 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
     errorValueHandler<
         NextLocalsT extends Locals,
         ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
+    > (handler : __ErrorValueHandler<AppUtil.ToErrorRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IApp<{
             __hasParentApp : DataT["__hasParentApp"],
-            locals : (
+            locals : Partial<
                 & DataT["locals"]
                 & NextLocalsT
-            ),
+            >,
         }>
     );
 
     asyncVoidHandler<
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
-    > (handler : __AsyncRequestVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
+    > (handler : __AsyncRequestVoidHandler<AppUtil.ToRequestRouteData<DataT>, ReturnT>) : (
         IApp<DataT>
     );
     /**
@@ -124,13 +127,16 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
     */
     asyncErrorVoidHandler<
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
-    > (handler : __AsyncErrorVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
-        IApp<DataT>
+    > (handler : __AsyncErrorVoidHandler<AppUtil.ToErrorRouteData<DataT>, ReturnT>) : (
+        IApp<{
+            __hasParentApp : DataT["__hasParentApp"],
+            locals : Partial<DataT["locals"]>,
+        }>
     );
 
     asyncValueHandler<
         NextLocalsT extends Locals
-    > (handler : AsyncRequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    > (handler : AsyncRequestValueHandler<AppUtil.ToRequestRouteData<DataT>, NextLocalsT>) : (
         IApp<{
             __hasParentApp : DataT["__hasParentApp"],
             locals : (
@@ -145,13 +151,13 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
     */
     asyncErrorValueHandler<
         NextLocalsT extends Locals
-    > (handler : AsyncErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    > (handler : AsyncErrorValueHandler<AppUtil.ToErrorRouteData<DataT>, NextLocalsT>) : (
         IApp<{
             __hasParentApp : DataT["__hasParentApp"],
-            locals : (
+            locals : Partial<
                 & DataT["locals"]
                 & NextLocalsT
-            ),
+            >,
         }>
     );
 

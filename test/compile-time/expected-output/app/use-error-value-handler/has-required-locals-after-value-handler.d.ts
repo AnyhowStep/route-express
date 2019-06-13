@@ -5,5 +5,7 @@ export declare const app: express.IApp<{
         isRequiredLocals: true;
     } & {
         readonly inLocals: true;
+    } & {
+        test: 2;
     }>;
 }>;
