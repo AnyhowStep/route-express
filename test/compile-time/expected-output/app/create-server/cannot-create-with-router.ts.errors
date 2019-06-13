@@ -1,0 +1,16 @@
+[
+  {
+    "messageText": "Value of type 'IRouter<{ __hasParentApp: false; locals: {}; }>' has no properties in common with type 'ServerOptions'. Did you mean to call it?",
+    "code": 2560,
+    "category": 1,
+    "length": 6,
+    "start": 135
+  },
+  {
+    "messageText": "Value of type 'IRouter<{ __hasParentApp: false; locals: {}; }>' has no properties in common with type 'ServerOptions'. Did you mean to call it?",
+    "code": 2560,
+    "category": 1,
+    "length": 6,
+    "start": 162
+  }
+]

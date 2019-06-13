@@ -1,25 +1,27 @@
 import * as express from "express";
 import * as expressCore from "express-serve-static-core";
 import {Locals} from "../locals";
-import {IRouter, RouterData} from "../router";
 import {__RequestValueHandler, __ErrorValueHandler} from "../value-handler";
 import {__RequestVoidHandler, __ErrorVoidHandler} from "../void-handler";
 import {__AsyncRequestVoidHandler, __AsyncErrorVoidHandler} from "../async-void-handler";
 import {AsyncRequestValueHandler, AsyncErrorValueHandler} from "../async-value-handler";
 import * as http from "http";
 import * as AppUtil from "./util";
+import { IRouter } from "../router";
 
 export interface AppData {
-    //To use this app
-    requiredLocals : Locals,
+    __hasParentApp : boolean,
     locals : Locals,
 }
 
 export type IAppBase<DataT extends AppData> = (
-    & Omit<expressCore.Express, "use">
+    & Omit<expressCore.Express, never>
+    & {
+        __hasParentApp : DataT["__hasParentApp"],
+    }
     //A modification of RequestListener implementation
     //so we can't call `http.createServer(app)`
-    //if it has requiredLocals
+    //if it has a parent app
     & {
         /**
          * Express instance itself is a request handler/
@@ -34,7 +36,7 @@ export type IAppBase<DataT extends AppData> = (
         ) : any;
     }
     //A modification of expressCore.RequestHandler
-    //to make it incompatible if it has requiredLocals
+    //to make it incompatible if it has a parent app
     & {
         (
             req: AppUtil.AssertExpressAppCompatible<
@@ -82,7 +84,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         ReturnT extends void|undefined=void|undefined
     > (handler : __RequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IApp<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -103,7 +105,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         ReturnT extends void|undefined=void|undefined
     > (handler : __ErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IApp<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -130,7 +132,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         NextLocalsT extends Locals
     > (handler : AsyncRequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
         IApp<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -145,7 +147,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         NextLocalsT extends Locals
     > (handler : AsyncErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
         IApp<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -153,52 +155,107 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         }>
     );
 
-    use : (
-        & expressCore.ApplicationRequestHandler<this>
-        & {
-            <RouterDataT extends RouterData>(
-                router : AppUtil.AssertCanUse<
-                    DataT,
-                    RouterDataT,
-                    IRouter<RouterDataT>
-                >
-            ) : IApp<DataT>
+    /**
+        Creates a new sub app.
+        The new sub app is automatically "used" by the parent app.
+
+        Internally, it does something like,
+        ```ts
+        const subApp = app();
+        for (let h of this.handlers) {
+            subApp.voidHandler(h);
         }
-        & {
-            <RouterDataT extends RouterData>(
-                path : expressCore.PathParams,
-                router : AppUtil.AssertCanUse<
-                    DataT,
-                    RouterDataT,
-                    IRouter<RouterDataT>
-                >
-            ) : IApp<DataT>
+        this.use(subApp);
+        ```
+    */
+    createSubApp () : (
+        IApp<{
+            __hasParentApp : true,
+            locals : DataT["locals"],
+        }>
+    );
+
+    /**
+        Creates a new router.
+        The new router is automatically "used" by the parent app.
+
+        Internally, it does something like,
+        ```ts
+        const r = router();
+        for (let h of this.handlers) {
+            r.voidHandler(h);
         }
-        & {
-            <SubAppDataT extends AppData>(
-                subApp : AppUtil.AssertCanUse<
-                    DataT,
-                    SubAppDataT,
-                    IApp<SubAppDataT>
-                >
-            ) : IApp<DataT>
-        }
-        & {
-            <SubAppDataT extends AppData>(
-                path : expressCore.PathParams,
-                router : AppUtil.AssertCanUse<
-                    DataT,
-                    SubAppDataT,
-                    IApp<SubAppDataT>
-                >
-            ) : IApp<DataT>
-        }
+        this.use(r);
+        ```
+    */
+    createRouter () : (
+        IRouter<{
+            __hasParentApp : true,
+            locals : DataT["locals"],
+        }>
     );
 }
-export function app<RequiredLocalsT extends Locals={}> () {
+export interface ParentApp<LocalsT extends Locals> {
+    /**
+        Creates a new sub app.
+        The new sub app is automatically "used" by the parent app.
+
+        Internally, it does something like,
+        ```ts
+        const subApp = app();
+        for (let h of this.handlers) {
+            subApp.voidHandler(h);
+        }
+        this.use(subApp);
+        ```
+    */
+    createSubApp () : (
+        IApp<{
+            __hasParentApp : true,
+            locals : LocalsT,
+        }>
+    );
+    /**
+        Creates a new router.
+        The new router is automatically "used" by the parent app.
+
+        Internally, it does something like,
+        ```ts
+        const r = router();
+        for (let h of this.handlers) {
+            r.voidHandler(h);
+        }
+        this.use(r);
+        ```
+    */
+    createRouter () : (
+        IRouter<{
+            __hasParentApp : true,
+            locals : LocalsT,
+        }>
+    );
+}
+/**
+    Creates a new "main" app.
+    Is backwards compatible with `expressCore.Express`.
+*/
+export function app () {
     const result = express() as unknown as IApp<{
-        requiredLocals : RequiredLocalsT,
-        locals : RequiredLocalsT,
+        __hasParentApp : false,
+        locals : {},
     }>;
+
+    result.__hasParentApp = false;
+
+    const originalUse = result.use.bind(result);
+    result.use = (...args : any[]) => {
+        for (const arg of args) {
+            if (arg != undefined && arg.__hasParentApp === true) {
+                throw new Error(`Attempt to use sub-app/router already used by an app`);
+            }
+        }
+        return originalUse(...args);
+    };
+
     return result;
 }

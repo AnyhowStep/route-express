@@ -1,18 +1,6 @@
 import {IRouter, RouterData} from "./router";
 import {Response, ResponseData} from "../response";
 
-export type RequiredLocalsOf<RouterT extends IRouter<RouterData>> = (
-    RouterT extends IRouter<infer DataT> ?
-    DataT["requiredLocals"] :
-    never
-);
-
-export type LocalsOf<RouterT extends IRouter<RouterData>> = (
-    RouterT extends IRouter<infer DataT> ?
-    DataT["locals"] :
-    never
-);
-
 export type DataOf<RouterT extends IRouter<RouterData>> = (
     RouterT extends IRouter<infer DataT> ?
     DataT :
@@ -35,4 +23,14 @@ export type ToRouteData<DataT extends RouterData> = (
             json : (response : unknown) => Response<ResponseData>,
         }
     }
+);
+
+export type AssertExpressRouterCompatible<
+    DataT extends RouterData,
+    ResultT,
+    ErrorT
+> = (
+    true extends DataT["__hasParentApp"] ?
+    ["This router is already used by an app and cannot be", ErrorT] :
+    ResultT
 );

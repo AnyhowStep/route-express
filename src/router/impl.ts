@@ -11,12 +11,18 @@ import {IRouter} from "./router";
 import * as RouterUtil from "./util";
 import {Locals} from "../locals";
 
+/**
+    Creates a new router.
+    Is backwards compatible with `expressCore.IRouter`.
+*/
 export function router () {
     const handlers : VoidHandler<any>[] = [];
     const result = express.Router() as unknown as IRouter<{
-        requiredLocals : {},
+        __hasParentApp : false,
         locals : {},
     }>;
+
+    result.__hasParentApp = false;
 
     result.voidHandler = <
         ReturnT extends void|undefined=void|undefined
@@ -88,7 +94,7 @@ export function router () {
         return result;
     };
 
-    result.addRoute = <RouteDeclarationT extends rd.RouteData>(
+    result.createRoute = <RouteDeclarationT extends rd.RouteData>(
         routeDeclaration : RouteDeclarationT
     ) => {
         const newRoute = route<RouteDeclarationT>(
@@ -104,5 +110,16 @@ export function router () {
         }
         return newRoute as IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, any>>;
     };
+
+    const originalUse = result.use.bind(result);
+    result.use = (...args : any[]) => {
+        for (const arg of args) {
+            if (arg != undefined && arg.__hasParentApp === true) {
+                throw new Error(`Attempt to use sub-app/router already used by an app`);
+            }
+        }
+        return originalUse(...args);
+    };
+
     return result;
 }

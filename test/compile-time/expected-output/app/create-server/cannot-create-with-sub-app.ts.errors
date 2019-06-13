@@ -1,0 +1,35 @@
+[
+  {
+    "messageText": {
+      "messageText": "Argument of type 'IApp<{ __hasParentApp: true; locals: {}; }>' is not assignable to parameter of type 'ServerOptions'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Types of property 'IncomingMessage' are incompatible.",
+        "category": 1,
+        "code": 2326,
+        "next": {
+          "messageText": "Type '[\"This app is already used as a sub-app and cannot be\", RequestListener] | undefined' is not assignable to type 'typeof IncomingMessage | undefined'.",
+          "category": 1,
+          "code": 2322,
+          "next": {
+            "messageText": "Type '[\"This app is already used as a sub-app and cannot be\", RequestListener]' is not assignable to type 'typeof IncomingMessage'.",
+            "category": 1,
+            "code": 2322
+          }
+        }
+      }
+    },
+    "code": 2345,
+    "category": 1,
+    "length": 6,
+    "start": 152
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ __hasParentApp: true; locals: {}; }>' is not assignable to parameter of type 'ServerOptions'.",
+    "code": 2345,
+    "category": 1,
+    "length": 6,
+    "start": 179
+  }
+]

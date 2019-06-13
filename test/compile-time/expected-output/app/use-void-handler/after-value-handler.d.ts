@@ -1,6 +1,6 @@
 import * as express from "../../../../../dist";
 export declare const app: express.IApp<{
-    requiredLocals: {};
+    __hasParentApp: false;
     locals: {
         readonly inLocals: true;
     };

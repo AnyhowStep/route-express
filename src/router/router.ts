@@ -10,8 +10,7 @@ import {AsyncRequestValueHandler, AsyncErrorValueHandler} from "../async-value-h
 import * as RouterUtil from "./util";
 
 export interface RouterData {
-    //To use this router
-    requiredLocals : Locals,
+    __hasParentApp : boolean,
     locals : Locals,
 }
 
@@ -53,15 +52,18 @@ export interface RouterData {
 */
 export type IRouterBase<DataT extends RouterData> = (
     & Omit<expressCore.IRouter, never>
+    & {
+        __hasParentApp : DataT["__hasParentApp"],
+    }
     //A modification of expressCore.RequestHandler
-    //to make it incompatible if it has requiredLocals
+    //to make it incompatible if it has a parent app
     & {
         (
-            req: (
-                {} extends DataT["requiredLocals"] ?
-                expressCore.Request :
-                never
-            ),
+            req: RouterUtil.AssertExpressRouterCompatible<
+                DataT,
+                expressCore.Request,
+                expressCore.RequestHandler
+            >,
             res: expressCore.Response,
             next: expressCore.NextFunction
         ) : any;
@@ -93,7 +95,7 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
         ReturnT extends void|undefined=void|undefined
     > (handler : __RequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IRouter<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -114,7 +116,7 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
         ReturnT extends void|undefined=void|undefined
     > (handler : __ErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IRouter<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -141,7 +143,7 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
         handler : AsyncRequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>
     ) : (
         IRouter<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -156,7 +158,7 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
         handler : AsyncErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>
     ) : (
         IRouter<{
-            requiredLocals : DataT["requiredLocals"],
+            __hasParentApp : DataT["__hasParentApp"],
             locals : (
                 & DataT["locals"]
                 & NextLocalsT
@@ -164,7 +166,7 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
         }>
     );
 
-    addRoute<RouteDeclarationT extends rd.RouteData> (
+    createRoute<RouteDeclarationT extends rd.RouteData> (
         routeDeclaration : RouteDeclarationT
     ) : IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, DataT["locals"]>>;
 }
