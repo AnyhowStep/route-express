@@ -1,3 +1,4 @@
+import * as rd from "route-declaration";
 import * as express from "express";
 import * as expressCore from "express-serve-static-core";
 import {Locals} from "../locals";
@@ -8,6 +9,8 @@ import {AsyncRequestValueHandler, AsyncErrorValueHandler, AsyncValueHandlerUtil}
 import * as http from "http";
 import * as AppUtil from "./util";
 import {IRouter, router} from "../router";
+import {IRoute, route} from "../route";
+import * as RouteDeclarationUtil from "../route-declaration-util";
 
 export interface AppData {
     __hasParentApp : boolean,
@@ -200,6 +203,10 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
             locals : DataT["locals"],
         }>
     );
+
+    createRoute<RouteDeclarationT extends rd.RouteData> (
+        routeDeclaration : RouteDeclarationT
+    ) : IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, DataT["locals"]>>;
 }
 export interface ParentApp<LocalsT extends Locals> {
     /**
@@ -240,6 +247,10 @@ export interface ParentApp<LocalsT extends Locals> {
             locals : LocalsT,
         }>
     );
+
+    createRoute<RouteDeclarationT extends rd.RouteData> (
+        routeDeclaration : RouteDeclarationT
+    ) : IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, LocalsT>>;
 }
 /**
     Creates a new "main" app.
@@ -365,6 +376,16 @@ export function app () {
             }
         }
         return r;
+    };
+
+    result.createRoute = <RouteDeclarationT extends rd.RouteData> (
+        routeDeclaration : RouteDeclarationT
+    ) : IRoute<any> => {
+        return route(
+            routeDeclaration,
+            result,
+            preRouteHandlers
+        );
     };
 
     const originalUse = result.use.bind(result);
