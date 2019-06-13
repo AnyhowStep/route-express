@@ -1,0 +1,18 @@
+[
+  {
+    "messageText": {
+      "messageText": "Argument of type '(req: Request<{ readonly params: any; readonly query: any; readonly body: any; readonly headers: any; }>, res: Response<{ readonly locals: {}; readonly json: (response: any) => Response<...>; }>, next: VoidNextFunction) => number' is not assignable to parameter of type '__RequestVoidHandler<{ readonly request: { readonly params: any; readonly query: any; readonly body: any; readonly headers: any; }; readonly response: { readonly locals: {}; readonly json: (response: any) => Response<...>; }; }, void | undefined>'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Type 'number' is not assignable to type 'void | undefined'.",
+        "category": 1,
+        "code": 2322
+      }
+    },
+    "code": 2345,
+    "category": 1,
+    "length": 21,
+    "start": 140
+  }
+]
