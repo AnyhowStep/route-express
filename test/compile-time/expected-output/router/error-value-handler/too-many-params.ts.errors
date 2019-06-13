@@ -1,0 +1,44 @@
+[
+  {
+    "messageText": "Argument of type '(err: any, req: any, res: any, next: any, tooMany: any) => void' is not assignable to parameter of type '__ErrorValueHandler<{ request: { params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }; response: { locals: Partial<{}>; json: (response: unknown) => Response<ResponseData>; }; }, Locals, void>'.",
+    "code": 2345,
+    "category": 1,
+    "length": 35,
+    "start": 111
+  },
+  {
+    "messageText": "Parameter 'err' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 3,
+    "start": 112
+  },
+  {
+    "messageText": "Parameter 'req' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 3,
+    "start": 117
+  },
+  {
+    "messageText": "Parameter 'res' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 3,
+    "start": 122
+  },
+  {
+    "messageText": "Parameter 'next' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 4,
+    "start": 127
+  },
+  {
+    "messageText": "Parameter 'tooMany' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 7,
+    "start": 133
+  }
+]
