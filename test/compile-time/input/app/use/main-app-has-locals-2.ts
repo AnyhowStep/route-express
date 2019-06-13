@@ -1,7 +1,7 @@
 import * as express from "../../../../../dist";
 
 const app = express.app()
-    .useAsyncValueHandler(async () => {
+    .asyncValueHandler(async () => {
         return {
             foo : true as true|1,
             bar : null as null|string,

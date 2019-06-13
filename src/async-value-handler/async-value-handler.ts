@@ -20,9 +20,3 @@ export type AsyncValueHandler<DataT extends RouteData, NextLocalsT extends Local
     | AsyncRequestValueHandler<DataT, NextLocalsT>
     | AsyncErrorValueHandler<DataT, NextLocalsT>
 );
-
-export function isAsyncRequestValueHandler<DataT extends RouteData, NextLocalsT extends Locals> (
-    handler : AsyncValueHandler<DataT, NextLocalsT>
-) : handler is AsyncRequestValueHandler<DataT, NextLocalsT> {
-    return (handler.length <= 2);
-}

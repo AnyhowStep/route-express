@@ -1,76 +1,94 @@
 import * as rd from "route-declaration";
 import * as express from "express";
 import * as expressCore from "express-serve-static-core";
-import {IRoute, RouteData, route} from "../route";
+import {IRoute, route} from "../route";
 import * as RouteDeclarationUtil from "../route-declaration-util";
-import {Locals} from "../locals";
-import {ErrorVoidHandler, VoidHandler} from "../void-handler";
-import {ErrorValueHandler, ValueHandler, ValueHandlerUtil, isRequestValueHandler} from "../value-handler";
-import {AsyncErrorVoidHandler, isAsyncRequestVoidHandler, AsyncVoidHandlerUtil, AsyncVoidHandler} from "../async-void-handler";
-import {AsyncErrorValueHandler, AsyncValueHandler, isAsyncRequestValueHandler, AsyncValueHandlerUtil} from "../async-value-handler";
+import {VoidHandler, __RequestVoidHandler, VoidHandlerUtil, __ErrorVoidHandler} from "../void-handler";
+import {ValueHandlerUtil, __RequestValueHandler, __ErrorValueHandler} from "../value-handler";
+import {AsyncVoidHandlerUtil, __AsyncRequestVoidHandler, __AsyncErrorVoidHandler} from "../async-void-handler";
+import {AsyncErrorValueHandler, AsyncValueHandlerUtil, AsyncRequestValueHandler} from "../async-value-handler";
 import {IRouter} from "./router";
 import * as RouterUtil from "./util";
+import {Locals} from "../locals";
 
-export function router<RequiredLocalsT extends Locals={}> () {
-    const handlers : VoidHandler<RouteData>[] = [];
+export function router () {
+    const handlers : VoidHandler<any>[] = [];
     const result = express.Router() as unknown as IRouter<{
-        requiredLocals : RequiredLocalsT,
-        locals : RequiredLocalsT,
+        requiredLocals : {},
+        locals : {},
     }>;
 
-    result.voidHandler = (handler : VoidHandler<RouterUtil.ToRouteData<any>>) : IRouter<any> => {
-        handlers.push(handler);
+    result.voidHandler = <
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestVoidHandler<RouterUtil.ToRouteData<any>, ReturnT>) : (
+        IRouter<any>
+    ) => {
+        handlers.push(VoidHandlerUtil.toSafeRequestVoidHandler(handler));
         return result;
     };
-    result.errorVoidHandler = (handler : ErrorVoidHandler<RouterUtil.ToRouteData<any>>) : IRouter<any> => {
-        handlers.push((
-            (err, req, res, next) => {
-                return handler(err, req, res, next);
-            }
-        ) as expressCore.ErrorRequestHandler);
-        return result;
-    };
-
-    result.valueHandler = (handler : ValueHandler<RouterUtil.ToRouteData<any>, any>) : IRouter<any> => {
-        if (isRequestValueHandler(handler)) {
-            handlers.push(ValueHandlerUtil.toRequestVoidHandler(handler));
-        } else {
-            handlers.push(ValueHandlerUtil.toErrorVoidHandler(handler));
-        }
-        return result;
-    };
-    result.errorValueHandler = (handler : ErrorValueHandler<RouterUtil.ToRouteData<any>, any>) : IRouter<any> => {
-        handlers.push(ValueHandlerUtil.toErrorVoidHandler(handler));
+    result.errorVoidHandler = <
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorVoidHandler<RouterUtil.ToRouteData<any>, ReturnT>) : (
+        IRouter<any>
+    ) => {
+        handlers.push(VoidHandlerUtil.toSafeErrorVoidHandler(handler));
         return result;
     };
 
-    result.asyncVoidHandler = (handler : AsyncVoidHandler<RouterUtil.ToRouteData<any>>) : IRouter<any> => {
-        if (isAsyncRequestVoidHandler(handler)) {
-            handlers.push(AsyncVoidHandlerUtil.toRequestVoidHandler(handler));
-        } else {
-            handlers.push(AsyncVoidHandlerUtil.toErrorVoidHandler(handler));
-        }
+    result.valueHandler = <
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestValueHandler<RouterUtil.ToRouteData<any>, NextLocalsT, ReturnT>) : (
+        IRouter<any>
+    ) => {
+        handlers.push(ValueHandlerUtil.toSafeRequestVoidHandler(handler));
         return result;
     };
-    result.asyncErrorVoidHandler = (handler : AsyncErrorVoidHandler<RouterUtil.ToRouteData<any>>) : IRouter<any> => {
-        handlers.push(AsyncVoidHandlerUtil.toErrorVoidHandler(handler));
-        return result;
-    };
-
-    result.asyncValueHandler = (handler : AsyncValueHandler<RouterUtil.ToRouteData<any>, any>) : IRouter<any> => {
-        if (isAsyncRequestValueHandler(handler)) {
-            handlers.push(AsyncValueHandlerUtil.toRequestVoidHandler(handler));
-        } else {
-            handlers.push(AsyncValueHandlerUtil.toErrorVoidHandler(handler));
-        }
-        return result;
-    };
-    result.asyncErrorValueHandler = (handler : AsyncErrorValueHandler<RouterUtil.ToRouteData<any>, any>) : IRouter<any> => {
-        handlers.push(AsyncValueHandlerUtil.toErrorVoidHandler(handler));
+    result.errorValueHandler = <
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorValueHandler<RouterUtil.ToRouteData<any>, NextLocalsT, ReturnT>) : (
+        IRouter<any>
+    ) => {
+        handlers.push(ValueHandlerUtil.toSafeErrorVoidHandler(handler));
         return result;
     };
 
-    result.add = <RouteDeclarationT extends rd.RouteData>(
+    result.asyncVoidHandler = <
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncRequestVoidHandler<RouterUtil.ToRouteData<any>, ReturnT>) : (
+        IRouter<any>
+    ) => {
+        handlers.push(AsyncVoidHandlerUtil.toSafeRequestVoidHandler(handler));
+        return result;
+    };
+    result.asyncErrorVoidHandler = <
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncErrorVoidHandler<RouterUtil.ToRouteData<any>, ReturnT>) : (
+        IRouter<any>
+    ) => {
+        handlers.push(AsyncVoidHandlerUtil.toSafeErrorVoidHandler(handler));
+        return result;
+    };
+
+    result.asyncValueHandler = <NextLocalsT extends Locals> (
+        handler : AsyncRequestValueHandler<RouterUtil.ToRouteData<any>, NextLocalsT>
+    ) : (
+        IRouter<any>
+    ) => {
+        handlers.push(AsyncValueHandlerUtil.toSafeRequestVoidHandler(handler));
+        return result;
+    };
+    result.asyncErrorValueHandler = <NextLocalsT extends Locals> (
+        handler : AsyncErrorValueHandler<RouterUtil.ToRouteData<any>, NextLocalsT>
+    ) : (
+        IRouter<any>
+    ) => {
+        handlers.push(AsyncValueHandlerUtil.toSafeErrorVoidHandler(handler));
+        return result;
+    };
+
+    result.addRoute = <RouteDeclarationT extends rd.RouteData>(
         routeDeclaration : RouteDeclarationT
     ) => {
         const newRoute = route<RouteDeclarationT>(
@@ -78,7 +96,11 @@ export function router<RequiredLocalsT extends Locals={}> () {
             result as unknown as expressCore.IRouter
         );
         for (const handler of handlers) {
-            newRoute.voidHandler(handler as any);
+            if (VoidHandlerUtil.isSafeRequestVoidHandler(handler)) {
+                newRoute.voidHandler(handler);
+            } else {
+                newRoute.errorVoidHandler(handler);
+            }
         }
         return newRoute as IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, any>>;
     };

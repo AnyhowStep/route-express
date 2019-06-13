@@ -2,7 +2,7 @@ import * as express from "../../../../../dist";
 import * as http from "http";
 
 const app = express.app()
-    .useAsyncValueHandler(async () => {
+    .asyncValueHandler(async () => {
         return {
             test : 32,
         };

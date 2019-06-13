@@ -24,12 +24,6 @@ export type ValueHandler<DataT extends RouteData, NextLocalsT extends Locals> = 
     | ErrorValueHandler<DataT, NextLocalsT>
 );
 
-export function isRequestValueHandler<DataT extends RouteData, NextLocalsT extends Locals> (
-    handler : ValueHandler<DataT, NextLocalsT>
-) : handler is RequestValueHandler<DataT, NextLocalsT> {
-    return (handler.length <= 3);
-}
-
 //Additional typedefs to help with compile-time safety
 //TODO Better name
 export interface __RequestValueHandler<DataT extends RouteData, NextLocalsT extends Locals, ReturnT extends void|undefined> {

@@ -1,8 +1,8 @@
 import {RequestData} from "../request";
 import {ResponseData} from "../response";
-import {RequestVoidHandler, ErrorVoidHandler} from "../void-handler";
-import {RequestValueHandler, ErrorValueHandler} from "../value-handler";
-import {AsyncRequestVoidHandler, AsyncErrorVoidHandler} from "../async-void-handler";
+import {__RequestVoidHandler, __ErrorVoidHandler} from "../void-handler";
+import {__RequestValueHandler, __ErrorValueHandler} from "../value-handler";
+import {__AsyncRequestVoidHandler, __AsyncErrorVoidHandler} from "../async-void-handler";
 import {AsyncRequestValueHandler, AsyncErrorValueHandler} from "../async-value-handler";
 import {Locals} from "../locals";
 
@@ -22,23 +22,30 @@ export interface RouteData {
     You should be careful when keeping around a variable of type `IRoute<>`.
 */
 export interface IRoute<DataT extends RouteData> {
-    voidHandler (handler : RequestVoidHandler<DataT>) : IRoute<DataT>;
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `errorVoidHandler()` until the above is fixed.
-    */
-    voidHandler (handler : ErrorVoidHandler<DataT>) : IRoute<DataT>;
+    voidHandler<
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
+    );
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `voidHandler()`
     */
-    errorVoidHandler (handler : ErrorVoidHandler<DataT>) : IRoute<DataT>;
+    errorVoidHandler<
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
+    );
 
-    valueHandler<NextLocalsT extends Locals> (handler : RequestValueHandler<DataT, NextLocalsT>) : (
+    /**
+        If passing a function literal,
+        you'll probably need to specify `NextLocalsT`
+        as TS will not be able to infer it properly.
+    */
+    valueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestValueHandler<DataT, NextLocalsT, ReturnT>) : (
         IRoute<{
             request : DataT["request"],
             response : {
@@ -51,30 +58,18 @@ export interface IRoute<DataT extends RouteData> {
         }>
     );
     /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `errorValueHandler()` until the above is fixed.
+        If passing a function literal,
+        you'll probably need to specify `NextLocalsT`
+        as TS will not be able to infer it properly.
     */
-    valueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<DataT, NextLocalsT>) : (
-        IRoute<{
-            request : DataT["request"],
-            response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                json : DataT["response"]["json"],
-            }
-        }>
-    );
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `valueHandler()`
     */
-    errorValueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<DataT, NextLocalsT>) : (
+    errorValueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorValueHandler<DataT, NextLocalsT, ReturnT>) : (
         IRoute<{
             request : DataT["request"],
             response : {
@@ -92,40 +87,24 @@ export interface IRoute<DataT extends RouteData> {
         }>
     );
 
-    asyncVoidHandler (handler : AsyncRequestVoidHandler<DataT>) : IRoute<DataT>;
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `asyncErrorVoidHandler()` until the above is fixed.
-    */
-    asyncVoidHandler (handler : AsyncErrorVoidHandler<DataT>) : IRoute<DataT>;
+    asyncVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncRequestVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
+    );
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `asyncVoidHandler()`
     */
-    asyncErrorVoidHandler (handler : AsyncErrorVoidHandler<DataT>) : IRoute<DataT>;
-
-    asyncValueHandler<NextLocalsT extends Locals> (handler : AsyncRequestValueHandler<DataT, NextLocalsT>) : (
-        IRoute<{
-            request : DataT["request"],
-            response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                json : DataT["response"]["json"],
-            }
-        }>
+    asyncErrorVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncErrorVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
     );
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
 
-        Use `asyncErrorValueHandler()` until the above is fixed.
-    */
-    asyncValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<DataT, NextLocalsT>) : (
+    asyncValueHandler<
+        NextLocalsT extends Locals
+    > (handler : AsyncRequestValueHandler<DataT, NextLocalsT>) : (
         IRoute<{
             request : DataT["request"],
             response : {
@@ -140,11 +119,10 @@ export interface IRoute<DataT extends RouteData> {
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `asyncValueHandler()`
     */
-    asyncErrorValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<DataT, NextLocalsT>) : (
+    asyncErrorValueHandler<
+        NextLocalsT extends Locals
+    > (handler : AsyncErrorValueHandler<DataT, NextLocalsT>) : (
         IRoute<{
             request : DataT["request"],
             response : {

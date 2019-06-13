@@ -57,7 +57,7 @@ export type IAppBase<DataT extends AppData> = (
     }
 )
 export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
-    useVoidHandler<
+    voidHandler<
         ReturnT extends void|undefined=void|undefined
     > (handler : __RequestVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
         IApp<DataT>
@@ -66,8 +66,8 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
     */
-    useErrorVoidHandler<
-    ReturnT extends void|undefined=void|undefined
+    errorVoidHandler<
+        ReturnT extends void|undefined=void|undefined
     > (handler : __ErrorVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
         IApp<DataT>
     );
@@ -77,7 +77,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         you'll probably need to specify `NextLocalsT`
         as TS will not be able to infer it properly.
     */
-    useValueHandler<
+    valueHandler<
         NextLocalsT extends Locals,
         ReturnT extends void|undefined=void|undefined
     > (handler : __RequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
@@ -98,7 +98,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
     */
-    useErrorValueHandler<
+    errorValueHandler<
         NextLocalsT extends Locals,
         ReturnT extends void|undefined=void|undefined
     > (handler : __ErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
@@ -111,7 +111,7 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         }>
     );
 
-    useAsyncVoidHandler<
+    asyncVoidHandler<
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
     > (handler : __AsyncRequestVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
         IApp<DataT>
@@ -120,13 +120,15 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
     */
-    useAsyncErrorVoidHandler<
+    asyncErrorVoidHandler<
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
     > (handler : __AsyncErrorVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
         IApp<DataT>
     );
 
-    useAsyncValueHandler<NextLocalsT extends Locals> (handler : AsyncRequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    asyncValueHandler<
+        NextLocalsT extends Locals
+    > (handler : AsyncRequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
         IApp<{
             requiredLocals : DataT["requiredLocals"],
             locals : (
@@ -139,7 +141,9 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
     */
-    useAsyncErrorValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    asyncErrorValueHandler<
+        NextLocalsT extends Locals
+    > (handler : AsyncErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
         IApp<{
             requiredLocals : DataT["requiredLocals"],
             locals : (

@@ -20,12 +20,6 @@ export type AsyncVoidHandler<DataT extends RouteData> = (
     | AsyncErrorVoidHandler<DataT>
 );
 
-export function isAsyncRequestVoidHandler<DataT extends RouteData> (
-    handler : AsyncVoidHandler<DataT>
-) : handler is AsyncRequestVoidHandler<DataT> {
-    return (handler.length <= 2);
-}
-
 //Additional typedefs to help with compile-time safety
 //TODO Better name
 export interface __AsyncRequestVoidHandler<DataT extends RouteData, ReturnT extends Promise<void|undefined>> {

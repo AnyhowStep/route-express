@@ -19,7 +19,7 @@ export type NextLocalsOf<HandlerT extends ValueHandler<any, any>> = (
     NextLocalsT :
     never
 );
-export function toRequestVoidHandler<HandlerT extends RequestValueHandler<RouteData, any>> (
+export function toSafeRequestVoidHandler<HandlerT extends RequestValueHandler<any, any>> (
     handler : HandlerT
 ) : RequestVoidHandler<RouteDataOf<HandlerT>> {
     return (
@@ -38,7 +38,7 @@ export function toRequestVoidHandler<HandlerT extends RequestValueHandler<RouteD
         });
     };
 }
-export function toErrorVoidHandler<HandlerT extends ErrorValueHandler<RouteData, any>> (
+export function toSafeErrorVoidHandler<HandlerT extends ErrorValueHandler<any, any>> (
     handler : HandlerT
 ) : ErrorVoidHandler<RouteDataOf<HandlerT>> {
     return (

@@ -1,7 +1,7 @@
 import * as express from "../../../../../dist";
 
 const subApp = express.app()
-    .useAsyncValueHandler(async () => {
+    .asyncValueHandler(async () => {
         return {
             test : 32,
         };
@@ -20,7 +20,7 @@ declare function valuesOfLocals<AppT extends express.IApp<any>> (app : AppT) : (
 export const subAppLocals = valuesOfLocals(subApp);
 
 const app = express.app()
-    .useAsyncValueHandler(async () => {
+    .asyncValueHandler(async () => {
         return {
             blah : "blah"
         }

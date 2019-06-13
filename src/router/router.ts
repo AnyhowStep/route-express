@@ -3,9 +3,9 @@ import * as expressCore from "express-serve-static-core";
 import {IRoute} from "../route";
 import * as RouteDeclarationUtil from "../route-declaration-util";
 import {Locals} from "../locals";
-import {RequestVoidHandler, ErrorVoidHandler} from "../void-handler";
-import {RequestValueHandler, ErrorValueHandler} from "../value-handler";
-import {AsyncRequestVoidHandler, AsyncErrorVoidHandler} from "../async-void-handler";
+import {__RequestVoidHandler, __ErrorVoidHandler} from "../void-handler";
+import {__RequestValueHandler, __ErrorValueHandler} from "../value-handler";
+import {__AsyncRequestVoidHandler, __AsyncErrorVoidHandler} from "../async-void-handler";
 import {AsyncRequestValueHandler, AsyncErrorValueHandler} from "../async-value-handler";
 import * as RouterUtil from "./util";
 
@@ -68,53 +68,30 @@ export type IRouterBase<DataT extends RouterData> = (
     }
 )
 export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
-    voidHandler (handler : RequestVoidHandler<RouterUtil.ToRouteData<DataT>>) : IRouter<DataT>;
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `errorVoidHandler()` until the above is fixed.
-    */
-    voidHandler (handler : ErrorVoidHandler<RouterUtil.ToRouteData<DataT>>) : IRouter<DataT>;
-    /**
-        This method was added as a workaround for,
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `voidHandler()`
-    */
-    errorVoidHandler (handler : ErrorVoidHandler<RouterUtil.ToRouteData<DataT>>) : IRouter<DataT>;
-
-    valueHandler<NextLocalsT extends Locals> (handler : RequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>) : (
-        IRouter<{
-            requiredLocals : DataT["requiredLocals"],
-            locals : (
-                & DataT["locals"]
-                & NextLocalsT
-            ),
-        }>
-    );
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `errorValueHandler()` until the above is fixed.
-    */
-    valueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>) : (
-        IRouter<{
-            requiredLocals : DataT["requiredLocals"],
-            locals : (
-                & DataT["locals"]
-                & NextLocalsT
-            ),
-        }>
+    voidHandler<
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
+        IRouter<DataT>
     );
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `valueHandler()`
     */
-    errorValueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    errorVoidHandler<
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
+        IRouter<DataT>
+    );
+
+    /**
+        If passing a function literal,
+        you'll probably need to specify `NextLocalsT`
+        as TS will not be able to infer it properly.
+    */
+    valueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IRouter<{
             requiredLocals : DataT["requiredLocals"],
             locals : (
@@ -123,24 +100,19 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
             ),
         }>
     );
-
-    asyncVoidHandler (handler : AsyncRequestVoidHandler<RouterUtil.ToRouteData<DataT>>) : IRouter<DataT>;
     /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `asyncErrorVoidHandler()` until the above is fixed.
+        If passing a function literal,
+        you'll probably need to specify `NextLocalsT`
+        as TS will not be able to infer it properly.
     */
-    asyncVoidHandler (handler : AsyncErrorVoidHandler<RouterUtil.ToRouteData<DataT>>) : IRouter<DataT>;
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `asyncVoidHandler()`
     */
-    asyncErrorVoidHandler (handler : AsyncErrorVoidHandler<RouterUtil.ToRouteData<DataT>>) : IRouter<DataT>;
-
-    asyncValueHandler<NextLocalsT extends Locals> (handler : AsyncRequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    errorValueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IRouter<{
             requiredLocals : DataT["requiredLocals"],
             locals : (
@@ -149,12 +121,25 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
             ),
         }>
     );
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
 
-        Use `asyncErrorValueHandler()` until the above is fixed.
+    asyncVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncRequestVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
+        IRouter<DataT>
+    );
+    /**
+        This method was added as a workaround for,
+        https://github.com/microsoft/TypeScript/issues/31867
     */
-    asyncValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    asyncErrorVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncErrorVoidHandler<RouterUtil.ToRouteData<DataT>, ReturnT>) : (
+        IRouter<DataT>
+    );
+
+    asyncValueHandler<NextLocalsT extends Locals> (
+        handler : AsyncRequestValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>
+    ) : (
         IRouter<{
             requiredLocals : DataT["requiredLocals"],
             locals : (
@@ -166,11 +151,10 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `asyncValueHandler()`
     */
-    asyncErrorValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    asyncErrorValueHandler<NextLocalsT extends Locals> (
+        handler : AsyncErrorValueHandler<RouterUtil.ToRouteData<DataT>, NextLocalsT>
+    ) : (
         IRouter<{
             requiredLocals : DataT["requiredLocals"],
             locals : (
@@ -180,7 +164,7 @@ export interface IRouter<DataT extends RouterData> extends IRouterBase<DataT> {
         }>
     );
 
-    add<RouteDeclarationT extends rd.RouteData> (
+    addRoute<RouteDeclarationT extends rd.RouteData> (
         routeDeclaration : RouteDeclarationT
     ) : IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, DataT["locals"]>>;
 }

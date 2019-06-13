@@ -1,12 +1,12 @@
 import * as express from "../../../../../dist";
 
 export const app = express.app<{ isRequiredLocals : true }>()
-    .useAsyncValueHandler(async () => {
+    .asyncValueHandler(async () => {
         return {
             inLocals : true,
         } as const;
     })
-    .useAsyncErrorVoidHandler((_err, req, res) => {
+    .asyncErrorVoidHandler((_err, req, res) => {
         req.params
         res.locals.isRequiredLocals
         res.locals.inLocals

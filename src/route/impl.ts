@@ -3,30 +3,24 @@ import * as express from "express";
 import * as expressCore from "express-serve-static-core";
 import * as handler from "../handler-lib";
 import {
-    RequestVoidHandler,
-    ErrorVoidHandler,
-    VoidHandler,
+    VoidHandlerUtil,
+    __RequestVoidHandler,
+    __ErrorVoidHandler,
 } from "../void-handler";
 import {
-    ErrorValueHandler,
-    RequestValueHandler,
-    ValueHandler,
     ValueHandlerUtil,
-    isRequestValueHandler,
+    __RequestValueHandler,
+    __ErrorValueHandler,
 } from "../value-handler";
 import {
-    AsyncRequestVoidHandler,
-    AsyncErrorVoidHandler,
-    AsyncVoidHandler,
     AsyncVoidHandlerUtil,
-    isAsyncRequestVoidHandler
+    __AsyncRequestVoidHandler,
+    __AsyncErrorVoidHandler
 } from "../async-void-handler";
 import {
     AsyncRequestValueHandler,
     AsyncErrorValueHandler,
-    AsyncValueHandler,
     AsyncValueHandlerUtil,
-    isAsyncRequestValueHandler
 } from "../async-value-handler";
 import {RouteData, IRoute} from "./route";
 import * as RouteDeclarationUtil from "../route-declaration-util";
@@ -72,71 +66,33 @@ export interface RouteArgs {
     readonly routeDeclaration : rd.RouteData,
     readonly expressRouter : expressCore.IRouter
 }
-export class Route<DataT extends RouteData> implements IRoute<DataT> {
-    private routerHandler : expressCore.IRouterHandler<expressCore.IRoute>;
+class Route<DataT extends RouteData> implements IRoute<DataT> {
+    private expressRouterHandler : expressCore.IRouterHandler<expressCore.IRoute>;
 
-    voidHandler (handler : RequestVoidHandler<DataT>) : Route<DataT>;
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `errorVoidHandler()` until the above is fixed.
-    */
-    voidHandler (handler : ErrorVoidHandler<DataT>) : Route<DataT>;
-    //voidHandler (handler : VoidHandler<DataT>) : Route<DataT>;
-    voidHandler (handler : VoidHandler<DataT>) : Route<DataT> {
-        this.routerHandler(handler);
+    voidHandler<
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
+    ) {
+        this.expressRouterHandler(VoidHandlerUtil.toSafeRequestVoidHandler(handler));
+        return this;
+    }
+    errorVoidHandler<
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
+    ) {
+        this.expressRouterHandler(VoidHandlerUtil.toSafeErrorVoidHandler(handler));
         return this;
     }
 
-    /**
-        This method was added as a workaround for,
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `voidHandler()`
-    */
-    errorVoidHandler (handler : ErrorVoidHandler<DataT>) : Route<DataT> {
-        this.routerHandler((
-            (err, req, res, next) => {
-                return handler(err, req, res, next);
-            }
-        ) as expressCore.ErrorRequestHandler);
-        return this;
-    }
-
-    valueHandler<NextLocalsT extends Locals> (handler : RequestValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                json : DataT["response"]["json"],
-            }
-        }>
-    );
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `errorValueHandler()` until the above is fixed.
-    */
-    valueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                json : DataT["response"]["json"],
-            }
-        }>
-    );
-    valueHandler<NextLocalsT extends Locals> (handler : ValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
+    valueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestValueHandler<DataT, NextLocalsT, ReturnT>) : (
+        IRoute<{
+            request : DataT["request"],
+            response : {
                 locals : (
                     & DataT["response"]["locals"]
                     & NextLocalsT
@@ -145,24 +101,16 @@ export class Route<DataT extends RouteData> implements IRoute<DataT> {
             }
         }>
     ) {
-        if (isRequestValueHandler(handler)) {
-            this.routerHandler(ValueHandlerUtil.toRequestVoidHandler<any>(handler));
-        } else {
-            this.routerHandler(ValueHandlerUtil.toErrorVoidHandler<any>(handler));
-        }
+        this.expressRouterHandler(ValueHandlerUtil.toSafeRequestVoidHandler(handler));
         return this;
     }
-    /**
-        This method was added as a workaround for,
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `valueHandler()`
-    */
-    errorValueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
+    errorValueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorValueHandler<DataT, NextLocalsT, ReturnT>) : (
+        IRoute<{
+            request : DataT["request"],
+            response : {
                 locals : (
                     & DataT["response"]["locals"]
                     & NextLocalsT
@@ -176,71 +124,33 @@ export class Route<DataT extends RouteData> implements IRoute<DataT> {
             }
         }>
     ) {
-        this.routerHandler(ValueHandlerUtil.toErrorVoidHandler<any>(handler));
+        this.expressRouterHandler(ValueHandlerUtil.toSafeErrorVoidHandler(handler));
         return this;
     }
 
-    asyncVoidHandler (handler : AsyncRequestVoidHandler<DataT>) : Route<DataT>;
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `asyncErrorVoidHandler()` until the above is fixed.
-    */
-    asyncVoidHandler (handler : AsyncErrorVoidHandler<DataT>) : Route<DataT>;
-    asyncVoidHandler (handler : AsyncVoidHandler<DataT>) : Route<DataT> {
-        if (isAsyncRequestVoidHandler(handler)) {
-            this.routerHandler(AsyncVoidHandlerUtil.toRequestVoidHandler<any>(handler));
-        } else {
-            this.routerHandler(AsyncVoidHandlerUtil.toErrorVoidHandler<any>(handler));
-        }
+    asyncVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncRequestVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
+    ) {
+        this.expressRouterHandler(AsyncVoidHandlerUtil.toSafeRequestVoidHandler(handler));
+        return this;
+    }
+    asyncErrorVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncErrorVoidHandler<DataT, ReturnT>) : (
+        IRoute<DataT>
+    ) {
+        this.expressRouterHandler(AsyncVoidHandlerUtil.toSafeErrorVoidHandler(handler));
         return this;
     }
 
-    /**
-        This method was added as a workaround for,
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `asyncVoidHandler()`
-    */
-    asyncErrorVoidHandler (handler : AsyncErrorVoidHandler<DataT>) : Route<DataT> {
-        this.routerHandler(AsyncVoidHandlerUtil.toErrorVoidHandler<any>(handler));
-        return this;
-    }
-
-    asyncValueHandler<NextLocalsT extends Locals> (handler : AsyncRequestValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                json : DataT["response"]["json"],
-            }
-        }>
-    );
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `asyncErrorValueHandler()` until the above is fixed.
-    */
-    asyncValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
-                locals : (
-                    & DataT["response"]["locals"]
-                    & NextLocalsT
-                ),
-                json : DataT["response"]["json"],
-            }
-        }>
-    );
-    asyncValueHandler<NextLocalsT extends Locals> (handler : AsyncValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
+    asyncValueHandler<
+        NextLocalsT extends Locals
+    > (handler : AsyncRequestValueHandler<DataT, NextLocalsT>) : (
+        IRoute<{
+            request : DataT["request"],
+            response : {
                 locals : (
                     & DataT["response"]["locals"]
                     & NextLocalsT
@@ -249,38 +159,24 @@ export class Route<DataT extends RouteData> implements IRoute<DataT> {
             }
         }>
     ) {
-        if (isAsyncRequestValueHandler(handler)) {
-            this.routerHandler(AsyncValueHandlerUtil.toRequestVoidHandler<any>(handler));
-        } else {
-            this.routerHandler(AsyncValueHandlerUtil.toErrorVoidHandler<any>(handler));
-        }
+        this.expressRouterHandler(AsyncValueHandlerUtil.toSafeRequestVoidHandler(handler));
         return this;
     }
-    /**
-        This method was added as a workaround for,
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `asyncValueHandler()`
-    */
-    asyncErrorValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<DataT, NextLocalsT>) : (
-        Route<{
-            readonly request : DataT["request"],
-            readonly response : {
+    asyncErrorValueHandler<
+        NextLocalsT extends Locals
+    > (handler : AsyncErrorValueHandler<DataT, NextLocalsT>) : (
+        IRoute<{
+            request : DataT["request"],
+            response : {
                 locals : (
                     & DataT["response"]["locals"]
                     & NextLocalsT
                 ),
-                //Technically, this causes the wrong return type.
-                //`ReturnType<DataT["response"]["json"]>`
-                //should be `DataT["response"]["locals"] & NextLocalsT`
-                //But is instead,
-                //`DataT["response"]["locals"]`
                 json : DataT["response"]["json"],
             }
         }>
     ) {
-        this.routerHandler(AsyncValueHandlerUtil.toErrorVoidHandler<any>(handler));
+        this.expressRouterHandler(AsyncValueHandlerUtil.toSafeErrorVoidHandler<any>(handler));
         return this;
     }
 
@@ -290,7 +186,7 @@ export class Route<DataT extends RouteData> implements IRoute<DataT> {
         const fullName = `${method} ${args.routeDeclaration.path.routerPath}`;
 
         const expressRoute = args.expressRouter.route(args.routeDeclaration.path.routerPath);
-        this.routerHandler = getRouterHandler(expressRoute, method);
+        this.expressRouterHandler = getRouterHandler(expressRoute, method);
         /*
             These handlers will invoke the mappers of the
             route declaration before running any other handlers.
@@ -298,7 +194,7 @@ export class Route<DataT extends RouteData> implements IRoute<DataT> {
             Every time we call `this.routerHandler()`,
             the state of the `expressRoute` object changes.
         */
-        this.routerHandler(
+        this.expressRouterHandler(
             (req, res, next) => {
                 if (res.headersSent) {
                     console.warn(`Headers already sent for: ${req.method} ${req.path}. Skipping route handlers for: ${fullName}`);
@@ -307,7 +203,7 @@ export class Route<DataT extends RouteData> implements IRoute<DataT> {
                     next();
                 }
             },
-            //We want to parse JSON body
+            //We want to parse JSON body, if it hasn't already been parsed
             express.json(),
             handler.responseMapper(
                 (args.routeDeclaration.response == undefined) ?

@@ -4,13 +4,13 @@
     "code": 2345,
     "category": 1,
     "length": 9,
-    "start": 765
+    "start": 762
   },
   {
     "messageText": "Argument of type 'IApp<{ requiredLocals: { foo: true; bar: string | null; }; locals: { foo: true; bar: string | null; }; }>' is not assignable to parameter of type '[\"Expected locals mismatch\", { foo: { expected: true; actual: true | 1; }; }]'.",
     "code": 2345,
     "category": 1,
     "length": 9,
-    "start": 794
+    "start": 791
   }
 ]

@@ -11,7 +11,7 @@ export type RouteDataOf<HandlerT extends AsyncVoidHandler<RouteData>> = (
     DataT :
     never
 );
-export function toRequestVoidHandler<HandlerT extends AsyncRequestVoidHandler<RouteData>> (
+export function toSafeRequestVoidHandler<HandlerT extends AsyncRequestVoidHandler<any>> (
     handler : HandlerT
 ) : RequestVoidHandler<RouteDataOf<HandlerT>> {
     return (
@@ -28,7 +28,7 @@ export function toRequestVoidHandler<HandlerT extends AsyncRequestVoidHandler<Ro
             .catch(next);
     };
 }
-export function toErrorVoidHandler<HandlerT extends AsyncErrorVoidHandler<RouteData>> (
+export function toSafeErrorVoidHandler<HandlerT extends AsyncErrorVoidHandler<any>> (
     handler : HandlerT
 ) : ErrorVoidHandler<RouteDataOf<HandlerT>> {
     return (
