@@ -29,3 +29,23 @@ export function isRequestValueHandler<DataT extends RouteData, NextLocalsT exten
 ) : handler is RequestValueHandler<DataT, NextLocalsT> {
     return (handler.length <= 3);
 }
+
+//Additional typedefs to help with compile-time safety
+//TODO Better name
+export interface __RequestValueHandler<DataT extends RouteData, NextLocalsT extends Locals, ReturnT extends void|undefined> {
+    (
+        req  : Request<DataT["request"]>,
+        res  : Response<DataT["response"]>,
+        next : ValueNextFunction<NextLocalsT>
+    ) : ReturnT;
+}
+//Additional typedefs to help with compile-time safety
+//TODO Better name
+export interface __ErrorValueHandler<DataT extends RouteData, NextLocalsT extends Locals, ReturnT extends void|undefined> {
+    (
+        err  : any,
+        req  : Request<DataT["request"]>,
+        res  : Response<DataT["response"]>,
+        next : ValueNextFunction<NextLocalsT>
+    ) : ReturnT;
+}

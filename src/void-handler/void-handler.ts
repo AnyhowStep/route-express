@@ -50,3 +50,23 @@ export function isRequestVoidHandler<DataT extends RouteData> (
 ) : handler is RequestVoidHandler<DataT> {
     return (handler.length <= 3);
 }
+
+//Additional typedefs to help with compile-time safety
+//TODO Better name
+export interface __RequestVoidHandler<DataT extends RouteData, ReturnT extends void|undefined> {
+    (
+        req  : Request<DataT["request"]>,
+        res  : Response<DataT["response"]>,
+        next : VoidNextFunction
+    ) : ReturnT;
+}
+//Additional typedefs to help with compile-time safety
+//TODO Better name
+export interface __ErrorVoidHandler<DataT extends RouteData, ReturnT extends void|undefined> {
+    (
+        err  : any,
+        req  : Request<DataT["request"]>,
+        res  : Response<DataT["response"]>,
+        next : VoidNextFunction
+    ) : ReturnT;
+}

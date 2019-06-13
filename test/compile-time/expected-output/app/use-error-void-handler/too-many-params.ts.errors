@@ -1,6 +1,6 @@
 [
   {
-    "messageText": "Argument of type '(err: any, req: any, res: any, next: any, tooMany: any) => void' is not assignable to parameter of type 'ErrorVoidHandler<{ request: { params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }; response: { locals: {}; json: (response: unknown) => Response<ResponseData>; }; }>'.",
+    "messageText": "Argument of type '(err: any, req: any, res: any, next: any, tooMany: any) => void' is not assignable to parameter of type '__ErrorVoidHandler<{ request: { params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }; response: { locals: {}; json: (response: unknown) => Response<ResponseData>; }; }, void>'.",
     "code": 2345,
     "category": 1,
     "length": 35,

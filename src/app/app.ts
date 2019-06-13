@@ -2,9 +2,9 @@ import * as express from "express";
 import * as expressCore from "express-serve-static-core";
 import {Locals} from "../locals";
 import {IRouter, RouterData} from "../router";
-import {RequestValueHandler, ErrorValueHandler} from "../value-handler";
-import {RequestVoidHandler, ErrorVoidHandler} from "../void-handler";
-import {AsyncRequestVoidHandler, AsyncErrorVoidHandler} from "../async-void-handler";
+import {__RequestValueHandler, __ErrorValueHandler} from "../value-handler";
+import {__RequestVoidHandler, __ErrorVoidHandler} from "../void-handler";
+import {__AsyncRequestVoidHandler, __AsyncErrorVoidHandler} from "../async-void-handler";
 import {AsyncRequestValueHandler, AsyncErrorValueHandler} from "../async-value-handler";
 import * as http from "http";
 import * as AppUtil from "./util";
@@ -57,23 +57,30 @@ export type IAppBase<DataT extends AppData> = (
     }
 )
 export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
-    useVoidHandler (handler : RequestVoidHandler<AppUtil.ToRouteData<DataT>>) : IApp<DataT>;
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `useErrorVoidHandler()` until the above is fixed.
-    */
-    useVoidHandler (handler : ErrorVoidHandler<AppUtil.ToRouteData<DataT>>) : IApp<DataT>;
+    useVoidHandler<
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
+        IApp<DataT>
+    );
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `useVoidHandler()`
     */
-    useErrorVoidHandler (handler : ErrorVoidHandler<AppUtil.ToRouteData<DataT>>) : IApp<DataT>;
+    useErrorVoidHandler<
+    ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
+        IApp<DataT>
+    );
 
-    useValueHandler<NextLocalsT extends Locals> (handler : RequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    /**
+        If passing a function literal,
+        you'll probably need to specify `NextLocalsT`
+        as TS will not be able to infer it properly.
+    */
+    useValueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __RequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IApp<{
             requiredLocals : DataT["requiredLocals"],
             locals : (
@@ -83,27 +90,18 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         }>
     );
     /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `useErrorValueHandler()` until the above is fixed.
+        If passing a function literal,
+        you'll probably need to specify `NextLocalsT`
+        as TS will not be able to infer it properly.
     */
-    useValueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
-        IApp<{
-            requiredLocals : DataT["requiredLocals"],
-            locals : (
-                & DataT["locals"]
-                & NextLocalsT
-            ),
-        }>
-    );
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `useValueHandler()`
     */
-    useErrorValueHandler<NextLocalsT extends Locals> (handler : ErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
+    useErrorValueHandler<
+        NextLocalsT extends Locals,
+        ReturnT extends void|undefined=void|undefined
+    > (handler : __ErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT, ReturnT>) : (
         IApp<{
             requiredLocals : DataT["requiredLocals"],
             locals : (
@@ -113,21 +111,20 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         }>
     );
 
-    useAsyncVoidHandler (handler : AsyncRequestVoidHandler<AppUtil.ToRouteData<DataT>>) : IApp<DataT>;
-    /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `useAsyncErrorVoidHandler()` until the above is fixed.
-    */
-    useAsyncVoidHandler (handler : AsyncErrorVoidHandler<AppUtil.ToRouteData<DataT>>) : IApp<DataT>;
+    useAsyncVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncRequestVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
+        IApp<DataT>
+    );
     /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `useAsyncVoidHandler()`
     */
-    useAsyncErrorVoidHandler (handler : AsyncErrorVoidHandler<AppUtil.ToRouteData<DataT>>) : IApp<DataT>;
+    useAsyncErrorVoidHandler<
+        ReturnT extends Promise<void|undefined>=Promise<void|undefined>
+    > (handler : __AsyncErrorVoidHandler<AppUtil.ToRouteData<DataT>, ReturnT>) : (
+        IApp<DataT>
+    );
 
     useAsyncValueHandler<NextLocalsT extends Locals> (handler : AsyncRequestValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
         IApp<{
@@ -139,25 +136,8 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         }>
     );
     /**
-        https://github.com/microsoft/TypeScript/issues/31867
-
-        Use `useAsyncErrorValueHandler()` until the above is fixed.
-    */
-    useAsyncValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
-        IApp<{
-            requiredLocals : DataT["requiredLocals"],
-            locals : (
-                & DataT["locals"]
-                & NextLocalsT
-            ),
-        }>
-    );
-    /**
         This method was added as a workaround for,
         https://github.com/microsoft/TypeScript/issues/31867
-
-        When it is fixed, you should go back to using
-        `useAsyncValueHandler()`
     */
     useAsyncErrorValueHandler<NextLocalsT extends Locals> (handler : AsyncErrorValueHandler<AppUtil.ToRouteData<DataT>, NextLocalsT>) : (
         IApp<{

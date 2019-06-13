@@ -25,3 +25,21 @@ export function isAsyncRequestVoidHandler<DataT extends RouteData> (
 ) : handler is AsyncRequestVoidHandler<DataT> {
     return (handler.length <= 2);
 }
+
+//Additional typedefs to help with compile-time safety
+//TODO Better name
+export interface __AsyncRequestVoidHandler<DataT extends RouteData, ReturnT extends Promise<void|undefined>> {
+    (
+        req  : Request<DataT["request"]>,
+        res  : Response<DataT["response"]>
+    ) : ReturnT;
+}
+//Additional typedefs to help with compile-time safety
+//TODO Better name
+export interface __AsyncErrorVoidHandler<DataT extends RouteData, ReturnT extends Promise<void|undefined>> {
+    (
+        err  : any,
+        req  : Request<DataT["request"]>,
+        res  : Response<DataT["response"]>
+    ) : ReturnT;
+}
