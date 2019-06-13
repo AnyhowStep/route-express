@@ -1,30 +1,18 @@
 [
   {
-    "messageText": "Argument of type '(req: any, res: any, next: any) => Promise<number>' is not assignable to parameter of type '__AsyncRequestVoidHandler<{ request: { params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }; response: { locals: {}; json: (response: unknown) => Response<ResponseData>; }; }, Promise<void | undefined>>'.",
+    "messageText": {
+      "messageText": "Argument of type '(req: Request<{ params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }>, res: Response<{ locals: {}; json: (response: unknown) => Response<ResponseData>; }>) => Promise<number>' is not assignable to parameter of type '__AsyncRequestVoidHandler<{ request: { params: { [k: string]: unknown; }; query: { [k: string]: unknown; }; body: { [k: string]: unknown; }; headers: { [k: string]: unknown; }; }; response: { locals: {}; json: (response: unknown) => Response<ResponseData>; }; }, Promise<void | undefined>>'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Type 'Promise<number>' is not assignable to type 'Promise<void | undefined>'.",
+        "category": 1,
+        "code": 2322
+      }
+    },
     "code": 2345,
     "category": 1,
-    "length": 27,
+    "length": 21,
     "start": 107
-  },
-  {
-    "messageText": "Parameter 'req' implicitly has an 'any' type.",
-    "code": 7006,
-    "category": 1,
-    "length": 3,
-    "start": 114
-  },
-  {
-    "messageText": "Parameter 'res' implicitly has an 'any' type.",
-    "code": 7006,
-    "category": 1,
-    "length": 3,
-    "start": 119
-  },
-  {
-    "messageText": "Parameter 'next' implicitly has an 'any' type.",
-    "code": 7006,
-    "category": 1,
-    "length": 4,
-    "start": 124
   }
 ]

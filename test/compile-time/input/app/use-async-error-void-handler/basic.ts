@@ -1,8 +1,8 @@
 import * as express from "../../../../../dist";
 
 export const app = express.app()
-    .useAsyncVoidHandler(async (req, res) => {
+    .useAsyncErrorVoidHandler((_err, req, res) => {
         req.params
         res.locals
-        return 1;
+        return Promise.resolve();
     });
