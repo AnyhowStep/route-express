@@ -34,7 +34,7 @@ export function router () {
     };
     result.errorVoidHandler = <
         ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorVoidHandler<RouterUtil.ToRequestRouteData<any>, ReturnT>) : (
+    > (handler : __ErrorVoidHandler<RouterUtil.ToErrorRouteData<any>, ReturnT>) : (
         IRouter<any>
     ) => {
         preRouteHandlers.push(VoidHandlerUtil.toSafeErrorVoidHandler(handler));
@@ -53,7 +53,7 @@ export function router () {
     result.errorValueHandler = <
         NextLocalsT extends Locals,
         ReturnT extends void|undefined=void|undefined
-    > (handler : __ErrorValueHandler<RouterUtil.ToRequestRouteData<any>, NextLocalsT, ReturnT>) : (
+    > (handler : __ErrorValueHandler<RouterUtil.ToErrorRouteData<any>, NextLocalsT, ReturnT>) : (
         IRouter<any>
     ) => {
         preRouteHandlers.push(ValueHandlerUtil.toSafeErrorVoidHandler(handler));
@@ -70,7 +70,7 @@ export function router () {
     };
     result.asyncErrorVoidHandler = <
         ReturnT extends Promise<void|undefined>=Promise<void|undefined>
-    > (handler : __AsyncErrorVoidHandler<RouterUtil.ToRequestRouteData<any>, ReturnT>) : (
+    > (handler : __AsyncErrorVoidHandler<RouterUtil.ToErrorRouteData<any>, ReturnT>) : (
         IRouter<any>
     ) => {
         preRouteHandlers.push(AsyncVoidHandlerUtil.toSafeErrorVoidHandler(handler));
@@ -86,7 +86,7 @@ export function router () {
         return result;
     };
     result.asyncErrorValueHandler = <NextLocalsT extends Locals> (
-        handler : AsyncErrorValueHandler<RouterUtil.ToRequestRouteData<any>, NextLocalsT>
+        handler : AsyncErrorValueHandler<RouterUtil.ToErrorRouteData<any>, NextLocalsT>
     ) : (
         IRouter<any>
     ) => {
