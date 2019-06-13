@@ -1,0 +1,23 @@
+[
+  {
+    "messageText": "Parameter 'err' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 3,
+    "start": 167
+  },
+  {
+    "messageText": "Parameter 'req' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 3,
+    "start": 172
+  },
+  {
+    "messageText": "Parameter 'res' implicitly has an 'any' type.",
+    "code": 7006,
+    "category": 1,
+    "length": 3,
+    "start": 177
+  }
+]
