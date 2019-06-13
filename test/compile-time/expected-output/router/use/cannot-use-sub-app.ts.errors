@@ -1,0 +1,25 @@
+[
+  {
+    "messageText": {
+      "messageText": "Argument of type 'IApp<{ __hasParentApp: true; locals: {}; }>' is not assignable to parameter of type 'PathParams'.",
+      "category": 1,
+      "code": 2345,
+      "next": {
+        "messageText": "Type 'IApp<{ __hasParentApp: true; locals: {}; }>' is missing the following properties from type '(string | RegExp)[]': pop, push, concat, join, and 26 more.",
+        "category": 1,
+        "code": 2740
+      }
+    },
+    "code": 2345,
+    "category": 1,
+    "length": 6,
+    "start": 171
+  },
+  {
+    "messageText": "Argument of type 'IApp<{ __hasParentApp: true; locals: {}; }>' is not assignable to parameter of type 'Application'.",
+    "code": 2345,
+    "category": 1,
+    "length": 6,
+    "start": 202
+  }
+]
