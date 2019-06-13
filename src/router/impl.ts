@@ -23,7 +23,11 @@ export function router<RequiredLocalsT extends Locals={}> () {
         return result;
     };
     result.errorVoidHandler = (handler : ErrorVoidHandler<RouterUtil.ToRouteData<any>>) : IRouter<any> => {
-        handlers.push(handler);
+        handlers.push((
+            (err, req, res, next) => {
+                return handler(err, req, res, next);
+            }
+        ) as expressCore.ErrorRequestHandler);
         return result;
     };
 

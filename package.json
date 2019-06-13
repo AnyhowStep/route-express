@@ -13,8 +13,7 @@
     "accept-one": "ts-node -P ./test/compile-time/tsconfig.json ./test/compile-time/accept-one.ts",
     "test-compile-time-interactive": "ts-node -P ./test/compile-time/tsconfig.json ./test/compile-time/interactive.ts",
     "test-run-time": "ts-node -P ./test/run-time/tsconfig.json -r ./test/run-time/tape-stream.ts -r ./test/run-time/bigint-to-json.ts ./test/run-time/runner.ts",
-    "generate-http-status-code": "ts-node -P ./script/tsconfig.json ./script/src/generate-http-status-code.ts",
-    "sanity-check": "(npm run generate-http-status-code) && (npm run rebuild) && (npm run test-compile-time) && (npm run test-run-time)"
+    "sanity-check": "(npm run rebuild) && (npm run test-compile-time) && (npm run test-run-time)"
   },
   "author": "anyhowstep",
   "license": "MIT",

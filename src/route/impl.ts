@@ -96,7 +96,11 @@ export class Route<DataT extends RouteData> implements IRoute<DataT> {
         `voidHandler()`
     */
     errorVoidHandler (handler : ErrorVoidHandler<DataT>) : Route<DataT> {
-        this.routerHandler(handler);
+        this.routerHandler((
+            (err, req, res, next) => {
+                return handler(err, req, res, next);
+            }
+        ) as expressCore.ErrorRequestHandler);
         return this;
     }
 

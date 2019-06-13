@@ -1,6 +1,6 @@
 import {IApp, AppData} from "./app";
 import {Response, ResponseData} from "../response";
-import { Locals } from "../locals";
+import {Locals} from "../locals";
 
 export type RequiredLocalsOf<AppT extends IApp<any>> = (
     AppT extends IApp<infer DataT> ?
