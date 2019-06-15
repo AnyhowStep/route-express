@@ -1,6 +1,6 @@
 {
   "name": "route-express",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Handle requests using route-declaration and express",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +17,10 @@
   },
   "author": "anyhowstep",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnyhowStep/route-express"
+  },
   "devDependencies": {
     "@types/diff": "^4.0.2",
     "@types/tape": "^4.2.33",
@@ -29,7 +33,7 @@
   "dependencies": {
     "@types/express": "^4.17.0",
     "express": "^4.17.1",
-    "route-declaration": "^0.3.1",
-    "type-mapping": "^1.4.1"
+    "route-declaration": "^0.3.2",
+    "type-mapping": "^1.4.2"
   }
 }
