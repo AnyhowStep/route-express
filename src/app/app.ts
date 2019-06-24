@@ -211,6 +211,14 @@ export interface IApp<DataT extends AppData> extends IAppBase<DataT> {
         routeDeclaration : RouteDeclarationT
     ) : IRoute<RouteDeclarationUtil.RouteDataOf<RouteDeclarationT, DataT["locals"]>>;
 }
+export type IMainApp<DataT extends Omit<AppData, "__hasParentApp">> = (
+    IApp<
+        & DataT
+        & {
+            __hasParentApp : false,
+        }
+    >
+);
 export interface ParentApp<LocalsT extends Locals> {
     /**
         Creates a new sub app.
