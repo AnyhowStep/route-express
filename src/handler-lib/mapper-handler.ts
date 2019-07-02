@@ -1,8 +1,10 @@
 import * as express from "express";
 import * as tm from "type-mapping";
+import * as rd from "route-declaration";
 import {RequestVoidHandler} from "../void-handler";
 import {RouteData} from "../route";
 import {Response, ResponseData} from "../response";
+import {makeOutputMappingError} from "../output-mapping-error";
 
 export function mapper<F extends tm.AnySafeMapper> (
     f : F,
@@ -20,9 +22,11 @@ export function mapper<F extends tm.AnySafeMapper> (
     };
 }
 export function responseMapper (
-    f : tm.AnyMapper,
-    name : string
+    routeDeclaration : rd.RouteData
 ) : RequestVoidHandler<RouteData> {
+    const f = (routeDeclaration.response == undefined) ?
+        () => undefined :
+        routeDeclaration.response;
     return (_req, res, next) => {
         const originalJson = res.json.bind(res);
         res.json = function (this : Response<ResponseData>, rawBody : any) : Response<ResponseData> {
@@ -30,7 +34,16 @@ export function responseMapper (
                 //We are in an erroneous state, we don't validate anything for now
                 return originalJson(rawBody);
             }
-            return originalJson(f(name, rawBody));
+            const mapResult = tm.tryMapHandled(f, "response", rawBody);
+            if (mapResult.success) {
+                return originalJson(mapResult.value);
+            } else {
+                throw makeOutputMappingError({
+                    message : mapResult.mappingError.message,
+                    routeDeclaration,
+                    response : mapResult.mappingError,
+                });
+            }
         };
         next();
     };

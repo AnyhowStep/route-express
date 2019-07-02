@@ -1,3 +1,4 @@
+import * as tm from "type-mapping";
 import * as rd from "route-declaration";
 import * as express from "express";
 import * as expressCore from "express-serve-static-core";
@@ -22,6 +23,7 @@ import {
 import {RouteData, IRoute} from "./route";
 import * as RouteDeclarationUtil from "../route-declaration-util";
 import {Locals} from "../locals";
+import { makeInputMappingError } from "../input-mapping-error";
 
 function getRouterHandler (
     route : expressCore.IRoute,
@@ -123,7 +125,6 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
     }
 
     constructor (args : RouteArgs) {
-        const headerMapper = args.routeDeclaration.header;
         const method = rd.RouteUtil.getMethod(args.routeDeclaration);
         const fullName = `${method} ${args.routeDeclaration.path.routerPath}`;
 
@@ -157,56 +158,19 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
             */
             //We want to parse JSON body, if it hasn't already been parsed
             express.json(),
-            handler.responseMapper(
-                (args.routeDeclaration.response == undefined) ?
-                    () => undefined :
-                    args.routeDeclaration.response,
-                `${fullName} response`
-            ),
-            handler.mapper(
-                (args.routeDeclaration.param == undefined) ?
+            handler.responseMapper(args.routeDeclaration),
+            (req : expressCore.Request, _res : expressCore.Response, next : expressCore.NextFunction) => {
+                const rawHeaderMapper = args.routeDeclaration.header;
+                const paramMapper = (args.routeDeclaration.param == undefined) ?
                     () => ({}) :
-                    args.routeDeclaration.param,
-                (req) => {
-                    return {
-                        name : `${fullName} parameter`,
-                        value : req.params
-                    };
-                },
-                (req, _res, value) => {
-                    req.params = value;
-                }
-            ),
-            handler.mapper(
-                (args.routeDeclaration.query == undefined) ?
+                    args.routeDeclaration.param;
+                const queryMapper = (args.routeDeclaration.query == undefined) ?
                     () => ({}) :
-                    args.routeDeclaration.query,
-                (req) => {
-                    return {
-                        name : `${fullName} query`,
-                        value : req.query
-                    };
-                },
-                (req, _res, value) => {
-                    req.query = value;
-                }
-            ),
-            handler.mapper(
-                (args.routeDeclaration.body == undefined) ?
+                    args.routeDeclaration.query;
+                const bodyMapper = (args.routeDeclaration.body == undefined) ?
                     () => ({}) :
-                    args.routeDeclaration.body,
-                (req) => {
-                    return {
-                        name : `${fullName} body`,
-                        value : req.body
-                    };
-                },
-                (req, _res, value) => {
-                    req.body = value;
-                }
-            ),
-            handler.mapper(
-                (headerMapper == undefined) ?
+                    args.routeDeclaration.body;
+                const headerMapper = (rawHeaderMapper == undefined) ?
                     (_name : string, mixed : unknown) => {
                         return mixed;
                     } :
@@ -216,7 +180,7 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
                         //`ApiKey` becomes `apikey`.
                         //You might want a `rename<>()` mapper.
                         //`rename("api-key", "apiKey", f)`
-                        const clean = headerMapper(name, mixed);
+                        const clean = rawHeaderMapper(name, mixed);
                         //When running the assertion,
                         //fields not checked are removed.
                         //But we want the unchecked headers
@@ -225,17 +189,51 @@ class Route<DataT extends RouteData> implements IRoute<DataT> {
                             ...mixed,
                             ...clean,
                         };
-                    },
-                (req) => {
-                    return {
-                        name : `${fullName} header`,
-                        value : req.headers
                     };
-                },
-                (req, _res, value) => {
-                    req.headers = value as any;
+                const paramResult = tm.tryMapHandled(paramMapper, `parameter`, req.params);
+                const queryResult = tm.tryMapHandled(queryMapper, `query`, req.query);
+                const bodyResult = tm.tryMapHandled(bodyMapper, `body`, req.body);
+                const headerResult = tm.tryMapHandled(headerMapper, `header`, req.headers);
+
+                if (
+                    paramResult.success &&
+                    queryResult.success &&
+                    bodyResult.success &&
+                    headerResult.success
+                ) {
+                    req.params = paramResult.value;
+                    req.query = queryResult.value;
+                    req.body = bodyResult.value;
+                    req.headers = headerResult.value as any;
+                    next();
+                    return;
                 }
-            ),
+
+                next(makeInputMappingError({
+                    message : "One or more errors were found with input",
+                    routeDeclaration : args.routeDeclaration,
+                    param : (
+                        paramResult.success ?
+                        undefined :
+                        paramResult.mappingError
+                    ),
+                    query : (
+                        queryResult.success ?
+                        undefined :
+                        queryResult.mappingError
+                    ),
+                    body : (
+                        bodyResult.success ?
+                        undefined :
+                        bodyResult.mappingError
+                    ),
+                    header : (
+                        headerResult.success ?
+                        undefined :
+                        headerResult.mappingError
+                    ),
+                }));
+            },
         );
     }
 }
