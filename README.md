@@ -48,7 +48,7 @@ server+client implementation using `type-mapping`, `axios` and `express`.
 import * as routeExpress from "route-express";
 import * as http from "http";
 
-//Backwards compatbile with require("express")();
+//Backwards compatible with require("express")();
 const app = routeExpress.app();
 app.createRoute(/*a route-declaration route*/)
     .voidHandler((req, res, next) => {
