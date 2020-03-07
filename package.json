@@ -1,6 +1,6 @@
 {
   "name": "route-express",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Handle requests using route-declaration and express",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@types/diff": "^4.0.2",
+    "@types/express": "^4.17.3",
     "@types/tape": "^4.2.33",
     "diff": "^4.0.1",
     "route-client": "^0.1.4",
@@ -31,7 +32,6 @@
     "typescript": "^3.5.1"
   },
   "dependencies": {
-    "@types/express": "^4.17.0",
     "express": "^4.17.1",
     "route-declaration": "^0.3.2",
     "type-mapping": "^1.15.0"
